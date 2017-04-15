@@ -90,3 +90,16 @@ def search_comment(user_name):  # is using for searching a perticular comment of
             print (comments_found[i])
         return post_id, comments_id_found
 
+
+def delete_comment(user_name):
+    media_id, comment_id = search_comment(user_name)
+    word_to_be_searched = input("Re-Enter the word you searched for so as to delete the comment containing it: ")
+    if not comment_id:
+        return False
+    else:
+        for each_item in range(len(comment_id)):
+            url = BASE_URL + "media/" + str(media_id) + "/comments/" + str(
+                comment_id[each_item]) + "/?access_token=" + App_Access_token
+            info_to_delete = requests.delete(url).json()  # Delete call to delete comment.
+    going_right_or_wrong(info_to_delete)
+
