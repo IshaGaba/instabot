@@ -48,3 +48,14 @@ def like_user_post(user_name):
     like = requests.post(url_post_like, Access_token).json()
     going_right_or_wrong(like)
 
+
+def comment_on_user_id(user_name):
+    post_id = get_post_id(user_name)
+    # post_id which is getting from  funn <<<user_post_id>>>
+    print ("write your comment u want to post: ")
+    entered_comment = input()  # getting comment which user want to write on post
+    url_comment = BASE_URL + "media/" + str(post_id) + "/comments"
+    Access_token_Plus_comment = {'access_token': App_Access_token, 'text': entered_comment}
+    comment_result = requests.post(url_comment, Access_token_Plus_comment).json()  # posting comment on pic
+    going_right_or_wrong(comment_result)
+
