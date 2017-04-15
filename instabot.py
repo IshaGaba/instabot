@@ -41,3 +41,10 @@ def get_post_id(user_name):
         going_right_or_wrong(request_for_post)
     return request_for_post["data"][post_no]['id']
 
+def like_user_post(user_name):
+    post_id = get_post_id(user_name)
+    Access_token = {'access_token': App_Access_token}
+    url_post_like = BASE_URL + "media/" + str(post_id) + "/likes"
+    like = requests.post(url_post_like, Access_token).json()
+    going_right_or_wrong(like)
+
