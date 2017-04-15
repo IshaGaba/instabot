@@ -103,3 +103,24 @@ def delete_comment(user_name):
             info_to_delete = requests.delete(url).json()  # Delete call to delete comment.
     going_right_or_wrong(info_to_delete)
 
+
+def find_average(username):
+    post_id = get_post_id(username)
+    no_of_words = 0
+    list_of_comments = []
+    comment_id = []
+    url = BASE_URL + "media/" + str(post_id) + "/comments/?access_token=" + App_Access_token
+    data = requests.get(url).json()
+    if len(data['data']) == 0:
+        print("no comments on this post")
+        return
+    else:
+        for comment in data['data']:
+            list_of_comments.append(comment['text'])  # making a list if comments
+            # print list_of_comments
+            no_of_words += len(comment['text'].split())  # calculating words in comment without counting spaces
+            # print no_of_words
+        average_words = float(no_of_words) / len(list_of_comments)
+        print("\nAverage on the post = %.2f" % average_words)
+        return
+
