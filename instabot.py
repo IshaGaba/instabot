@@ -28,3 +28,16 @@ def get_user_id_username(user_name):  # get user id
     going_right_or_wrong(user_info)
     return user_info["data"][0]["id"]
 
+def get_post_id(user_name):
+    user_id = get_user_id_username(user_name)
+    user_url = BASE_URL + "users/" + str(user_id) + "/media/recent/?access_token=" + App_Access_token  # https://api.instagram.com/v1/users/{user-id}/media/recent/?access_token=ACCESS-TOKEN
+    request_for_post = requests.get(user_url).json()
+    if len(request_for_post["data"]) == 0:
+        print ("user has no post")
+    else:
+        print ('we have total ' + str(len(request_for_post)) + ' posts of :' + str(user_name) + '\nWhich post you want to choose?')
+        post_no = int (input("Enter your choice:"))
+        post_no= (post_no-1)
+        going_right_or_wrong(request_for_post)
+    return request_for_post["data"][post_no]['id']
+
