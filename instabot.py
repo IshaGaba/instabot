@@ -124,3 +124,32 @@ def find_average(username):
         print("\nAverage on the post = %.2f" % average_words)
         return
 
+
+def main():
+    info_owner()  # calling funn to print owner information
+    Variable1 = "y"
+    while Variable1 == "y":
+        print ("Type the username from following \n-> gabaishu7596  \n-> shivtaj21   ")
+        user_name = input()
+        print ("select what do you want to do \n1:like \n2:comment \n3:search a word \n4:delete a comment ")
+        print ("5:average of words of comment on post")  # choice what user want to do
+        choice = input("your option: ")
+        if choice == "1":
+            like_user_post(user_name)  # for like a pic
+        elif choice == "2":
+            comment_on_user_id(user_name)  # comment on pic
+        elif choice == "3":
+            search_comment(user_name)  # searching commnet on pic
+        elif choice == '4':
+            delete_comment(user_name)  # deleting comment on pic
+        elif choice == '5':
+            find_average(user_name)  # finding average
+        else:
+            print ("you chose wrong")
+        print (" press any key for exit or press y to continue ")  # choice he want to do again or not
+        Variable1 = input()
+    print ("________________________THANK YOU_________________________")
+
+
+main()
+
