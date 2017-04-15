@@ -59,3 +59,34 @@ def comment_on_user_id(user_name):
     comment_result = requests.post(url_comment, Access_token_Plus_comment).json()  # posting comment on pic
     going_right_or_wrong(comment_result)
 
+
+def search_comment(user_name):  # is using for searching a perticular comment of user choice
+    post_id = get_post_id(user_name)
+    print ("Type the word you want to search comment")
+    search = input()  # getting comment which user want to search on post
+    search_comments = BASE_URL + "media/" + str(post_id) + "/comments?access_token=" + App_Access_token
+    find_comments = requests.get(search_comments).json()
+    list_comments_id = []
+    list_comments = []
+    user_name = []
+    for each in find_comments['data']:
+        list_comments.append(each['text'])
+        list_comments_id.append(each['id'])
+        user_name.append(each['from']['username'])
+    comments_id_found = []
+    comments_found = []
+    user_found = []
+    for each_item in range(len(list_comments)):  # Loop to look for the comment that contains the specified word
+        if search in list_comments[each_item]:
+            comments_found.append(list_comments[each_item])
+            comments_id_found.append(list_comments_id[each_item])
+            user_found.append(user_name[each_item])
+    if len(comments_found) == 0:  # No comment Found
+        print ("No comment have such word")
+        return post_id, False
+    else:  # Comment found!
+        print ("Following are the comments that contains the word:")
+        for i in range(len(comments_found)):
+            print (comments_found[i])
+        return post_id, comments_id_found
+
