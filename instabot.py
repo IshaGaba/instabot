@@ -1,7 +1,10 @@
-import requests
+
+import requests # requests library added here
 App_Access_token = "2247652388.61a4075.a8ace6f81850450683de586106907181" #access_token
 BASE_URL = "https://api.instagram.com/v1/" #common url
 
+
+# this func check the status
 def going_right_or_wrong(data):
     right = data['meta']['code']
     if right == 200:
@@ -28,6 +31,7 @@ def get_user_id_username(user_name):  # get user id
     going_right_or_wrong(user_info)
     return user_info["data"][0]["id"]
 
+# this func gets the post id
 def get_post_id(user_name):
     user_id = get_user_id_username(user_name)
     user_url = BASE_URL + "users/" + str(user_id) + "/media/recent/?access_token=" + App_Access_token  # https://api.instagram.com/v1/users/{user-id}/media/recent/?access_token=ACCESS-TOKEN
@@ -41,6 +45,8 @@ def get_post_id(user_name):
         going_right_or_wrong(request_for_post)
     return request_for_post["data"][post_no]['id']
 
+
+# this func likes the post
 def like_user_post(user_name):
     post_id = get_post_id(user_name)
     Access_token = {'access_token': App_Access_token}
@@ -49,6 +55,7 @@ def like_user_post(user_name):
     going_right_or_wrong(like)
 
 
+# this func comments on the post
 def comment_on_user_id(user_name):
     post_id = get_post_id(user_name)
     # post_id which is getting from  funn <<<user_post_id>>>
@@ -91,6 +98,7 @@ def search_comment(user_name):  # is using for searching a perticular comment of
         return post_id, comments_id_found
 
 
+# this func deletes the comment on the post
 def delete_comment(user_name):
     media_id, comment_id = search_comment(user_name)
     word_to_be_searched = input("Re-Enter the word you searched for so as to delete the comment containing it: ")
@@ -104,6 +112,7 @@ def delete_comment(user_name):
     going_right_or_wrong(info_to_delete)
 
 
+# this func finds the average word in all comments on a post
 def find_average(username):
     post_id = get_post_id(username)
     no_of_words = 0
@@ -125,6 +134,7 @@ def find_average(username):
         return
 
 
+# this func is main working func
 def main():
     info_owner()  # calling funn to print owner information
     Variable1 = "y"
