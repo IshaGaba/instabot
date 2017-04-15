@@ -1,4 +1,6 @@
 
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~INSTABOT~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 import requests # requests library added here
 App_Access_token = "2247652388.61a4075.a8ace6f81850450683de586106907181" #access_token
 BASE_URL = "https://api.instagram.com/v1/" #common url
@@ -6,6 +8,7 @@ BASE_URL = "https://api.instagram.com/v1/" #common url
 
 # this func check the status
 def going_right_or_wrong(data):
+    print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
     right = data['meta']['code']
     if right == 200:
         print ("successfully found user id and fetched user's post id ")
@@ -141,9 +144,13 @@ def main():
     while Variable1 == "y":
         print ("Type the username from following \n-> gabaishu7596  \n-> shivtaj21   ")
         user_name = input()
+        print(
+            "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
         print ("select what do you want to do \n1:like \n2:comment \n3:search a word \n4:delete a comment ")
         print ("5:average of words of comment on post")  # choice what user want to do
         choice = input("your option: ")
+        print(
+            "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
         if choice == "1":
             like_user_post(user_name)  # for like a pic
         elif choice == "2":
@@ -156,9 +163,12 @@ def main():
             find_average(user_name)  # finding average
         else:
             print ("you chose wrong")
+        print(
+            "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
         print (" press any key for exit or press y to continue ")  # choice he want to do again or not
         Variable1 = input()
-    print ("________________________THANK YOU_________________________")
+    print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+    print ("_______________________________________________THANK YOU_________________________________________________")
 
 
 main()
