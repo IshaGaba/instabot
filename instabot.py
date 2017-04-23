@@ -1,4 +1,3 @@
-
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~INSTABOT~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 import requests # requests library added here
@@ -22,8 +21,9 @@ def info_owner():  # using get to collect owner information
     print ("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~OWNER INFORMATION:~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
     print ("owner id is " + owner_info["data"]['id'])
     print ("owner full name is " + owner_info["data"]["full_name"])
-    print ("owner bio is " + owner_info["data"]["bio"])
     print ("owner usename is " + owner_info["data"]["username"])
+    if owner_info["data"]["bio"] != "":
+        print ("owner bio is " + owner_info["data"]["bio"])
     print ("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
 
 
@@ -35,23 +35,32 @@ def get_user_id_username(user_name):  # get user id
     return user_info["data"][0]["id"]
 
 # this func gets the post id
-def get_post_id(user_name):
-    user_id = get_user_id_username(user_name)
-    user_url = BASE_URL + "users/" + str(user_id) + "/media/recent/?access_token=" + App_Access_token  # https://api.instagram.com/v1/users/{user-id}/media/recent/?access_token=ACCESS-TOKEN
-    request_for_post = requests.get(user_url).json()
-    if len(request_for_post["data"]) == 0:
-        print ("user has no post")
+def get_user_post_id(username,choice=0):
+    user_id1 = get_user_id_username(username)
+    url_user1 = BASE_URL + "users/" + str(user_id1) + "/media/recent/?access_token=" + App_Access_token  # https://api.instagram.com/v1/users/{user-id}/media/recent/?access_token=ACCESS-TOKEN
+    request_for_user_to_get_all_post = requests.get(url_user1).json()
+    post_index = 0  # For most recent post
+    like_list_on_each_post = []
+    total_media=len(request_for_user_to_get_all_post["data"])
+    if total_media == 0:
+        print("\nThis User has no post!")
     else:
-        print ('we have total ' + str(len(request_for_post)) + ' posts of :' + str(user_name) + '\nWhich post you want to choose?')
-        post_no = int (input("Enter your choice:"))
-        post_no= (post_no-1)
-        going_right_or_wrong(request_for_post)
-    return request_for_post["data"][post_no]['id']
+        for each_media in range(0, total_media):
+            like_list_on_each_post.append(request_for_user_to_get_all_post['data'][each_media]['likes']['count'])
+        if choice == 1:  # If we want least liked post to be liked
+            least_count = min(like_list_on_each_post)
+            post_index = like_list_on_each_post.index(least_count)
+        if choice == 3:  # If we want most popular post to be liked
+            most_count = max(like_list_on_each_post)
+            post_index = like_list_on_each_post.index(most_count)
+    print ("Link to the Media is ", request_for_user_to_get_all_post['data'][post_index]['link'])  # To print the link to a media.
+    post_id = request_for_user_to_get_all_post["data"][post_index]['id']
+    return post_id  # To return the particular media ID
 
 
 # this func likes the post
-def like_user_post(user_name):
-    post_id = get_post_id(user_name)
+def like_user_post(user_name,opt):
+    post_id = get_user_post_id(user_name,opt)
     Access_token = {'access_token': App_Access_token}
     url_post_like = BASE_URL + "media/" + str(post_id) + "/likes"
     like = requests.post(url_post_like, Access_token).json()
@@ -60,7 +69,7 @@ def like_user_post(user_name):
 
 # this func comments on the post
 def comment_on_user_id(user_name):
-    post_id = get_post_id(user_name)
+    post_id = get_user_post_id(user_name,0)
     # post_id which is getting from  funn <<<user_post_id>>>
     print ("write your comment u want to post: ")
     entered_comment = input()  # getting comment which user want to write on post
@@ -71,7 +80,7 @@ def comment_on_user_id(user_name):
 
 
 def search_comment(user_name):  # is using for searching a perticular comment of user choice
-    post_id = get_post_id(user_name)
+    post_id = get_user_post_id(user_name)
     print ("Type the word you want to search comment")
     search = input()  # getting comment which user want to search on post
     search_comments = BASE_URL + "media/" + str(post_id) + "/comments?access_token=" + App_Access_token
@@ -93,17 +102,17 @@ def search_comment(user_name):  # is using for searching a perticular comment of
             user_found.append(user_name[each_item])
     if len(comments_found) == 0:  # No comment Found
         print ("No comment have such word")
-        return post_id, False
+        return False, post_id, False
     else:  # Comment found!
         print ("Following are the comments that contains the word:")
         for i in range(len(comments_found)):
             print (comments_found[i])
-        return post_id, comments_id_found
+        return comments_id_found, post_id, comments_found
 
 
 # this func deletes the comment on the post
 def delete_comment(user_name):
-    media_id, comment_id = search_comment(user_name)
+    comment_id, media_id, comment = search_comment(user_name)
     word_to_be_searched = input("Re-Enter the word you searched for so as to delete the comment containing it: ")
     if not comment_id:
         return False
@@ -112,12 +121,19 @@ def delete_comment(user_name):
             url = BASE_URL + "media/" + str(media_id) + "/comments/" + str(
                 comment_id[each_item]) + "/?access_token=" + App_Access_token
             info_to_delete = requests.delete(url).json()  # Delete call to delete comment.
-    going_right_or_wrong(info_to_delete)
+            if info_to_delete['meta']['code'] == 200:
+                print (comment[each_item] + " deleted")
+                print ("Your task was successfully performed.")
+                break
+            elif info_to_delete['meta']['error_message'] == "You cannot delete this comment":  # By Default Error
+                print (comment[each_item], " = ", info_to_delete['meta']['error_message'])
+            else:
+                print ("Sorry!!!\nYou faced an error while performing your task.\nTry again later!")
 
 
 # this func finds the average word in all comments on a post
 def find_average(username):
-    post_id = get_post_id(username)
+    post_id = get_user_post_id(username)
     no_of_words = 0
     list_of_comments = []
     comment_id = []
@@ -141,31 +157,33 @@ def find_average(username):
 def main():
     info_owner()  # calling funn to print owner information
     Variable1 = "y"
-    while Variable1 == "y":
+    while Variable1 == "y" :
         print ("Type the username from following \n-> gabaishu7596  \n-> shivtaj21   ")
         user_name = input()
         print(
             "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
         print ("select what do you want to do \n1:like \n2:comment \n3:search a word \n4:delete a comment ")
         print ("5:average of words of comment on post")  # choice what user want to do
-        choice = input("your option: ")
+        choice = int(input("your option: "))
         print(
             "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
-        if choice == "1":
-            like_user_post(user_name)  # for like a pic
-        elif choice == "2":
+        if choice == 1:
+            print ("which post you want to like\n1.least popular\n2.recent media\n3.most popular")
+            opt=int (input("your option: "))
+            like_user_post(user_name,opt)  # for like a pic
+        elif choice == 2:
             comment_on_user_id(user_name)  # comment on pic
-        elif choice == "3":
+        elif choice == 3:
             search_comment(user_name)  # searching commnet on pic
-        elif choice == '4':
+        elif choice == 4:
             delete_comment(user_name)  # deleting comment on pic
-        elif choice == '5':
+        elif choice == 5:
             find_average(user_name)  # finding average
         else:
             print ("you chose wrong")
         print(
             "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
-        print (" press any key for exit or press y to continue ")  # choice he want to do again or not
+        print (" press any key for exit or press y  to continue ")  # choice he want to do again or not
         Variable1 = input()
     print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
     print ("_______________________________________________THANK YOU_________________________________________________")
